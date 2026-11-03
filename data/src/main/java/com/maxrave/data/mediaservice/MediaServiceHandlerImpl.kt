@@ -720,7 +720,6 @@ internal class MediaServiceHandlerImpl(
                                     continuation = data.second,
                                 ),
                             )
-                            clearMediaItems()
                             currentSong.durationSeconds.let {
                                 songRepository.updateDurationSeconds(it, currentSong.videoId)
                             }
@@ -757,7 +756,7 @@ internal class MediaServiceHandlerImpl(
     }
 
     override fun resetSongAndQueue() {
-        player.clearMediaItems()
+        clearMediaItems()
         _queueData.value = QueueData()
     }
 
@@ -809,13 +808,13 @@ internal class MediaServiceHandlerImpl(
         mediaItem: GenericMediaItem,
         playWhenReady: Boolean,
     ) {
-        player.clearMediaItems()
         player.setMediaItem(mediaItem)
         player.prepare()
         player.playWhenReady = playWhenReady
     }
 
     override fun clearMediaItems() {
+        player.stop()
         player.clearMediaItems()
     }
 
@@ -1686,7 +1685,6 @@ internal class MediaServiceHandlerImpl(
         songRepository.insertSong(track.toSongEntity()).singleOrNull()?.let {
             Logger.d(TAG, "Inserted song: ${track.title}")
         }
-        clearMediaItems()
         track.durationSeconds?.let {
             songRepository.updateDurationSeconds(it, track.videoId)
         }
